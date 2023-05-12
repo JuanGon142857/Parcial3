@@ -79,20 +79,20 @@ vector <float> Lineal :: Get_x() const{
 
 const float Lineal :: p(float x) {
     float delta = 0.3;
-    return delta;
+    return 0;
 }
 
 const float Lineal :: q(float x){
     float alpha;
     float beta;
-    return alpha * x + beta * x * x * x;
+    return -1 * 1;
 }
 
 const float Lineal :: r(float x){
     float c;
-    float omeg;
+    float omeg = 1;
 
-    return - c * cos(omeg * x);
+    return 0.5 * cos(omeg * x);
 }
 
 void Lineal :: Set_x() {
@@ -109,6 +109,7 @@ void Lineal :: Solve(){
         omega_i.push_back(0);
     }
     
+    //Paso 1
     float h = (xf - x0) / (N + 1); //Divide el intervalo en secciones
     float x = x0 + h;
     
@@ -117,6 +118,7 @@ void Lineal :: Solve(){
     std :: vector <float> c_i(N + 2);
     std :: vector <float> d_i(N + 2);   d_i[1] = -h * h * r(x) + (1 + (h / 2) * p(x)) * y0;
 
+    //Paso 2
     for (size_t i = 2; i <= N - 1; i++){
         x = x0 + i * h;
         a_i[i] = 2 + h * h * q(x);
@@ -125,26 +127,32 @@ void Lineal :: Solve(){
         d_i[i] = -h * h * r(x);
     }
 
+    //Paso 3
     x = xf - h;
     a_i[N] = 2 + h * h * q(x);
     c_i[N] = -1 - (h / 2) * p(x);
     d_i[N] = -h * h * r(x) + (1 - (h / 2) * p(x)) * yf;
 
+    //Paso 4. Pasos del al 8 son factorizacion LU del sistema tridiagonal
     std :: vector <float> l_i(N + 2);   l_i[1] = a_i[1];
     std :: vector <float> u_i(N + 2);   u_i[1] = b_i[1] / a_i[1];
     std :: vector <float> z_i(N + 2);   z_i[1] = d_i[1] / l_i[1];
 
+    //Paso 5
     for (size_t i = 2; i <= N - 1; i++){
         l_i[i] = a_i[i] - c_i[i] * u_i[i - 1];
         u_i[i] = b_i[i] / l_i[i];
         z_i[i] = (d_i[i] - c_i[i] * z_i[i - 1]) / l_i[i];
     }
 
+    //Paso 6
     l_i[N] = a_i[N] - c_i[N] * u_i[N - 1];
     z_i[N] = (d_i[N] - c_i[N] * z_i[N - 1]) / l_i[N];
 
+    //Paso 7
     omega_i[0] = y0;   omega_i[N + 1] = yf;    omega_i[N] = z_i[N];
 
+    //Paso 8
     for (size_t i = N - 1; i >= 1; i--){
         omega_i[i] = z_i[i] - u_i[i] * omega_i[i + 1];
     }     
