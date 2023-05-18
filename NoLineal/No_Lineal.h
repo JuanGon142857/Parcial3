@@ -6,20 +6,20 @@
 class No_Lineal : public Lineal
 {
     public:
-        No_Lineal(float = 0, float = 0, float = 0, float = 0, int = 2, int = 10, float = 1E-8); // constructor predeterminado
+        No_Lineal(double = 0, double = 0, double = 0, double = 0, int = 2, int = 10, double = 1E-8); // constructor predeterminado
 
         void Set_MaxIter( int );
-        void Set_TOL ( float );
+        void Set_TOL ( double );
         int Get_MaxIter() const;
-        float Get_TOL () const;
+        double Get_TOL () const;
 
-        const float f( float, float, float );
+        const double f( double, double, double );
 
         void Solve();
     private:
         
         int MaxIter;
-        float TOL;
+        double TOL;
 
 };
 

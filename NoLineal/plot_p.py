@@ -3,15 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 
-data = pd.read_csv("./Duffin oscilator.csv")
+data = pd.read_csv("./Ejercicio 2 libro.csv")
 
 def f(x):
-    return x* np.sin(x) / 2
+    return 1 / (x + 3)
 
+plt.plot(data.x.values, f(data.x.values))
+plt.scatter(data.x.values, data.y.values, c = 'r')
 
-plt.plot(data.x.values - 150, data.y.values)
-#plt.plot(data.x.values, f(data.x.values), linestyle = 'dashed')
-plt.legend(["Numerico", "Exacto"])
+plt.xticks(np.linspace(-1, 0, 5), fontsize = 20)
+plt.yticks(np.linspace(0.3, 0.5, 5), fontsize = 20)
+plt.legend(["Exacto", "Numérico"], fontsize = 20)
 plt.show()
-#print(data.x.values)
+print(data.y.values)
+print(f(data.x.values))
+print(abs(data.y.values - f(data.x.values)))
 

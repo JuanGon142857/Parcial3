@@ -7,7 +7,7 @@ using namespace std;
 
 #include "No_Lineal.h"
 
-No_Lineal :: No_Lineal(float x0, float xf, float y0, float yf, int N, int MaxIter, float TOL) 
+No_Lineal :: No_Lineal(double x0, double xf, double y0, double yf, int N, int MaxIter, double TOL) 
 : Lineal(x0, xf, y0, yf, N){
     Set_MaxIter( MaxIter );
     Set_TOL( TOL );
@@ -23,7 +23,7 @@ void No_Lineal :: Set_MaxIter( int k ){
     }
 }
 
-void No_Lineal :: Set_TOL( float tol ){
+void No_Lineal :: Set_TOL( double tol ){
     if (tol <= 0){
         cout << "El valor de tolerancia ingresa no es valido, se redefinio como 1E-8\n";
         TOL = 1E-8;
@@ -37,20 +37,18 @@ int No_Lineal :: Get_MaxIter() const{
     return MaxIter;
 }
 
-float No_Lineal :: Get_TOL() const{
+double No_Lineal :: Get_TOL() const{
     return TOL;
 }
 
-const float No_Lineal :: f( float x, float y, float yp){
-    float S = 1000.;
-    float E = 3.0e7;
-    float l = 120.;
-    float q = 100./12; //constantes que se usan en el ejercicio 6
+const double No_Lineal :: f( double x, double y, double yp){
+    double S = 1000.;
+    double I = 625.;
+    double E = 3.0e7;
+    double l = 120.;
+    double q = 100./12; //constantes que se usan en el ejercicio 6
 
-    float gamma = 0.1;
-    float delta = 0.1;
-    float freq = 1.4;
-    return y - y * y * y - gamma * yp + delta * cos(freq * x);
+    return (S / (E * I) * y + q * x * (x - l) / (2 * E * I)) / pow((1 + yp * yp), 3./2) ;
 }
 
 void No_Lineal :: Solve(){
@@ -62,7 +60,7 @@ void No_Lineal :: Solve(){
     }
 
     //Paso 1
-    float h = (Get_xf() - Get_x0()) / (Get_N() + 1); //Divide el intervalo en secciones
+    double h = (Get_xf() - Get_x0()) / (Get_N() + 1); //Divide el intervalo en secciones
     omega_i[0] = y0;   omega_i[N + 1] = yf;
 
     //Paso 2
@@ -70,15 +68,15 @@ void No_Lineal :: Solve(){
         omega_i[i] = y0 + i * (yf - y0) / (xf - x0) * h;
     }
 
-    std :: vector <float> a_i(N + 2);
-    std :: vector <float> b_i(N + 2);
-    std :: vector <float> c_i(N + 2);
-    std :: vector <float> d_i(N + 2);
+    std :: vector <double> a_i(N + 2);
+    std :: vector <double> b_i(N + 2);
+    std :: vector <double> c_i(N + 2);
+    std :: vector <double> d_i(N + 2);
 
-    std :: vector <float> l_i(N + 2);
-    std :: vector <float> u_i(N + 2);
-    std :: vector <float> v_i(N + 2);
-    std :: vector <float> z_i(N + 2);
+    std :: vector <double> l_i(N + 2);
+    std :: vector <double> u_i(N + 2);
+    std :: vector <double> v_i(N + 2);
+    std :: vector <double> z_i(N + 2);
 
     //Paso 3
     size_t k = 1;
@@ -89,8 +87,8 @@ void No_Lineal :: Solve(){
     while ((!Completado) && (k <= MaxIter)){
 
         //Paso 5
-        float x = x0 + h;
-        float t = (omega_i[2] - y0) / (2 * h);
+        double x = x0 + h;
+        double t = (omega_i[2] - y0) / (2 * h);
 
         a_i[1] = 2 + h * h * (f(x, omega_i[1] + h, t) - f(x, omega_i[1], t)) / h; 
         b_i[1] = -1 + (h / 2) * (f(x, omega_i[1], t + h) - f(x, omega_i[1], t)) / h; 
@@ -139,7 +137,7 @@ void No_Lineal :: Solve(){
             omega_i[i] = omega_i[i] + v_i[i];
         }
 
-        float suma_v = 0;
+        double suma_v = 0;
         for (auto& n : v_i){
             suma_v += n * n;
         }
