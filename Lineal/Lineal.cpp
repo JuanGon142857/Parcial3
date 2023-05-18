@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Lineal :: Lineal(float x0, float xf, float y0, float yf, int N){
+Lineal :: Lineal(double x0, double xf, double y0, double yf, int N){
     Set_x0(x0);
     Set_xf(xf);
     Set_y0(y0);
@@ -15,11 +15,11 @@ Lineal :: Lineal(float x0, float xf, float y0, float yf, int N){
     Set_N(N);
 }
 
-void Lineal :: Set_x0(float a){
+void Lineal :: Set_x0(double a){
     x0 = a;
 }
 
-void Lineal :: Set_xf(float b){
+void Lineal :: Set_xf(double b){
     if (b == x0){
         std :: cout << "Se tiene xf = x0, se redefinio xf = x0 + 1 para evitar esto\n";
         xf = b + 1;
@@ -30,11 +30,11 @@ void Lineal :: Set_xf(float b){
     
 }
 
-void Lineal :: Set_y0(float alpha){
+void Lineal :: Set_y0(double alpha){
     y0 = alpha;
 }
 
-void Lineal :: Set_yf(float beta){
+void Lineal :: Set_yf(double beta){
     yf = beta;
 }
 
@@ -48,19 +48,19 @@ void Lineal :: Set_N(int n){
     }
 }
 
-float Lineal :: Get_x0() const{
+double Lineal :: Get_x0() const{
     return x0;
 }
 
-float Lineal :: Get_xf() const{
+double Lineal :: Get_xf() const{
     return xf;
 }
 
-float Lineal :: Get_y0() const{
+double Lineal :: Get_y0() const{
     return y0;
 }
 
-float Lineal :: Get_yf() const{
+double Lineal :: Get_yf() const{
     return yf;
 }
 
@@ -69,30 +69,34 @@ int Lineal :: Get_N() const{
 }
 
 
-vector <float> Lineal :: Get_omega() const{
+vector <double> Lineal :: Get_omega() const{
     return omega_i;
 }
 
-vector <float> Lineal :: Get_x() const{
+vector <double> Lineal :: Get_x() const{
     return x_i;
 };
 
-const float Lineal :: p(float x) {
-    float delta = 0.3;
+const double Lineal :: p(double x) {
+    double delta = 0.3;
     return 0;
 }
 
-const float Lineal :: q(float x){
-    float alpha;
-    float beta;
-    return -1 * 1;
+const double Lineal :: q(double x){
+    double S = 1000.;
+    double I = 625.;
+    double E = 3e7;
+    return S / (E * I);
 }
 
-const float Lineal :: r(float x){
-    float c;
-    float omeg = 1;
+const double Lineal :: r(double x){
+    double S = 1000.;
+    double I = 625.;
+    double E = 3e7;
+    double q = 100. / 12;
+    double l = 120.;
 
-    return 0.5 * cos(omeg * x);
+    return q * x / (2 * E * I) * (x - l);
 }
 
 void Lineal :: Set_x() {
@@ -110,13 +114,13 @@ void Lineal :: Solve(){
     }
     
     //Paso 1
-    float h = (xf - x0) / (N + 1); //Divide el intervalo en secciones
-    float x = x0 + h;
+    double h = (xf - x0) / (N + 1); //Divide el intervalo en secciones
+    double x = x0 + h;
     
-    std :: vector <float> a_i(N + 2);   a_i[1] = 2 + h * h * q(x);
-    std :: vector <float> b_i(N + 2);   b_i[1] = -1 + h / 2 * p(x);
-    std :: vector <float> c_i(N + 2);
-    std :: vector <float> d_i(N + 2);   d_i[1] = -h * h * r(x) + (1 + (h / 2) * p(x)) * y0;
+    std :: vector <double> a_i(N + 2);   a_i[1] = 2 + h * h * q(x);
+    std :: vector <double> b_i(N + 2);   b_i[1] = -1 + h / 2 * p(x);
+    std :: vector <double> c_i(N + 2);
+    std :: vector <double> d_i(N + 2);   d_i[1] = -h * h * r(x) + (1 + (h / 2) * p(x)) * y0;
 
     //Paso 2
     for (size_t i = 2; i <= N - 1; i++){

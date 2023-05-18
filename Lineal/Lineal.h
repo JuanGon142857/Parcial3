@@ -5,40 +5,40 @@
 
 class Lineal{
     public:
-        Lineal(float = 0, float = 0, float = 0, float = 0, int = 2); //constructor predeterminado
+        Lineal(double = 0, double = 0, double = 0, double = 0, int = 2); //constructor predeterminado
 
-        void Set_x0( float );
-        void Set_xf( float );
-        void Set_y0( float );
-        void Set_yf( float );
+        void Set_x0( double );
+        void Set_xf( double );
+        void Set_y0( double );
+        void Set_yf( double );
         void Set_N( int );
 
-        float Get_x0() const;
-        float Get_xf() const;
-        float Get_y0() const;
-        float Get_yf() const;
+        double Get_x0() const;
+        double Get_xf() const;
+        double Get_y0() const;
+        double Get_yf() const;
         int Get_N() const;
 
-        const float p( float );
-        const float q( float );
-        const float r( float );
+        const double p( double );
+        const double q( double );
+        const double r( double );
 
         void Solve();
         void Set_x();
 
-        std :: vector <float> Get_omega() const;
-        std :: vector <float> Get_x() const;
+        std :: vector <double> Get_omega() const;
+        std :: vector <double> Get_x() const;
 
         void Solution2csv( const char* );
 
     protected:
 
-        float x0;       float xf;       //limites del intervalo
-        float y0;       float yf;       //funcion evaluada en los limites del intervalo 
-        float N;
+        double x0;       double xf;       //limites del intervalo
+        double y0;       double yf;       //funcion evaluada en los limites del intervalo 
+        int N;
 
-        std :: vector <float> x_i;      //Puntos donde se evalua la funcion
-        std :: vector <float> omega_i;  //Aproximaciones obtenidas
+        std :: vector <double> x_i;      //Puntos donde se evalua la funcion
+        std :: vector <double> omega_i;  //Aproximaciones obtenidas
 };
 
 #endif
