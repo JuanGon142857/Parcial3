@@ -10,8 +10,6 @@
 
 using namespace std;
 
-
-
 Parcial :: Parcial(double xL, double xR, double Beta, double Gamma, double T, int N, int m, double TOL){
     Set_xL(xL);
     Set_xR(xR);
@@ -75,7 +73,6 @@ void Parcial :: Set_TOL(double tol){
     TOL = tol;
 }
 
-
 double Parcial :: Get_T() const{
     return T;
 }
@@ -104,14 +101,6 @@ complex <double> Parcial :: f( double x) {
     double c = 1;
     return sqrt( 2 * a / gamma ) * 1. / cosh(sqrt(-2 * a / beta) * x) * exp( 1i * (-c / beta) * x);
 };
-/*
-double Parcial :: F(std :: complex <double> uj, std :: complex <double> ujn){
-    return (uj != ujn)? lambda / (p + 1) * (pow(abs(uj), p + 1.) - pow(abs(ujn), p + 1.)) / (pow(abs(uj), 2.) - pow(abs(ujn), p + 1.)) * (uj + ujn) : lambda * pow(abs(uj), p + 1.) * uj;
-};
-
-complex <double> Parcial :: G(std :: complex <double> uj, std :: complex <double> ujn){
-    return (uj != ujn)? 1i * v * (pow(abs(uj), 2.) + pow(abs(ujn), 2.)) / (pow(abs(uj), 2.) - pow(abs(ujn), 2.)) * (uj - ujn) : 1i * v * uj;
-};*/
 
 vector <vector <double>> Parcial :: inv_mat(vector <vector <double>> A){
     double det = A[0][0] * A[1][1] - A[1][0] * A[0][1];
@@ -302,20 +291,8 @@ void Parcial :: CrankNicolson( const char* filename ){
     }
 
     ofstream Solucion( filename);
-    if (!Solucion){
-        cerr << "No se pudo crear el archivo \n";
-        exit( 1 );
-    }
-    else{
-        Solucion << "T";
-        for (int i = 1; i <= Get_m(); i++){
-            Solucion << ",x" << i; 
-        }
-        Solucion << "\n";
-        Solucion.close();
-    }
-
-
+    Solucion.close();
+    
     vector <vector <double>> b(N);
     vector <vector <double>> temp(N); //Aqui se guardan las aproximaciones de cada paso mientras la solucion converge al valor buscado
 
@@ -373,7 +350,7 @@ void Parcial :: CrankNicolson( const char* filename ){
             for (int i = L.size() - 1; i >= 0; i--){
                 suma = y[i][0] * y[i][0] + y[i][1] * y[i][1]; //tamaño del error
             }
-            cout << "Correccion: "<< suma << "\n";
+            cout << "Modulo de la correccion: "<< suma << "\n";
 
             for (int i = L.size() - 1; i >= 0; i--){
                 temp[i][0] = temp[i][0] - y[i][0];
@@ -381,7 +358,7 @@ void Parcial :: CrankNicolson( const char* filename ){
             }
             if (suma <= TOL){
                 Correcto = true;
-                cout << "Corvergio !!. El valor del paso temporal aca es " << jj << "\n";
+                cout << "Converge. Esto corresponde al paso temporal " << jj + 1 << "\n";
             }
         }
         omega = temp;
@@ -394,9 +371,15 @@ void Parcial :: CrankNicolson( const char* filename ){
         }
         
         else{
-            Solucion << jj * k;
+            //Solucion << jj * k;
             for (int i = 0; i < Get_N(); i++){
-                Solucion << "," << setw(9) << setprecision(8) << fixed << omega[i][1] * omega[i][1] + omega[i][0] * omega[i][0]; 
+                if (omega[i][1] >= 0){
+                    Solucion  << setw(9) << setprecision(8) << omega[i][0] << "+" << omega[i][1] << "i" << ","; 
+                }
+                else{
+                    Solucion << setw(9) << setprecision(8) << omega[i][0] << setw(9) << setprecision(8) << omega[i][1] << "i" << ","; 
+                }
+                
             }
             Solucion << "\n";
             Solucion.close();
