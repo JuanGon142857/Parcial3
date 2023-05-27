@@ -56,8 +56,8 @@ class Parcial{
         std :: vector< std :: vector <double>> mat_mat_sum( std :: vector < std :: vector <double>>, std :: vector < std :: vector <double>>);
         std :: vector< std :: vector <double>> mat_const_mul( std :: vector < std :: vector <double>>, double);
 
-        std :: vector <double> vec_vec_sum( std :: vector <double>, std :: vector <double>);
-        std :: vector <double> vec_const_mul( std :: vector <double>, double);
+        std :: vector <double> mat_mat_sum( std :: vector <double>, std :: vector <double>);
+        std :: vector <double> mat_const_mul( std :: vector <double>, double);
 
         std :: vector <double> F(int);
 
@@ -65,7 +65,7 @@ class Parcial{
         std :: vector <double> df2_di(int);
 
         std :: vector <std :: vector <double>> mat_mat_mul(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>);  //multiplicacion entre matrices
-        std :: vector <double> mat_vec_mul(std :: vector <std :: vector <double>>, std :: vector <double>); //multiplicacion de matriz por vector
+        std :: vector <double> mat_mat_mul(std :: vector <std :: vector <double>>, std :: vector <double>); //multiplicacion de matriz por vector
 
         //void Solution2csv( const char* );
 };

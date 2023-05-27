@@ -142,7 +142,7 @@ vector <vector <double>> Parcial :: mat_mat_mul(vector <vector <double>> A,vecto
 }
 
 //Funcion para aplicar matriz 2x2 sobre vector 2x1
-vector <double> Parcial :: mat_vec_mul(vector <vector <double>> M, vector <double> v){
+vector <double> Parcial :: mat_mat_mul(vector <vector <double>> M, vector <double> v){
     if (M[0].size() == v.size()){
         vector <double> vp(M.size());
         for (int i = 0; i < v.size(); i++){
@@ -191,7 +191,7 @@ vector<vector <double>> Parcial :: mat_const_mul(vector <vector <double>> A, dou
 }
 
 //Funcion para sumar 2 vectores
-vector <double> Parcial :: vec_vec_sum(vector <double> A, vector <double> B){
+vector <double> Parcial :: mat_mat_sum(vector <double> A, vector <double> B){
     if ((A.size() == B.size())){
         vector <double> C = A;
         for (int i = 0; i < A.size(); i++){
@@ -206,7 +206,7 @@ vector <double> Parcial :: vec_vec_sum(vector <double> A, vector <double> B){
 }
 
 //Funcion para multiplicar vector por una constante
-vector <double> Parcial :: vec_const_mul(vector <double> A, double c){
+vector <double> Parcial :: mat_const_mul(vector <double> A, double c){
     vector <double> cA = A;
     for (int i = 0; i < A.size(); i++){
         cA[i] = A[i] * c;
@@ -216,7 +216,7 @@ vector <double> Parcial :: vec_const_mul(vector <double> A, double c){
 
 //Función de condiciones iniciales
 complex <double> Parcial :: f( double x) {
-    double a = 10;
+    double a = 1;
     double c = 1;
     return sqrt( 2 * a / gamma ) * 1. / cosh(sqrt(-2 * a / beta) * x) * exp( 1i * (-c / beta) * x);
 };
@@ -316,20 +316,20 @@ void Parcial :: CrankNicolson( const char* filename ){
 
            //Algoritmo de Crout por bloques de matrices 2x2
             U[0] = mat_mat_mul(inv_mat(A[0]), C[0]);
-            z[0] = mat_vec_mul(inv_mat(A[0]), b[0]);
+            z[0] = mat_mat_mul(inv_mat(A[0]), b[0]);
 
             for (int i = 1; i < N - 1; i++){
                 L[i] = mat_mat_sum(A[i], mat_const_mul(mat_mat_mul(B[0], U[i - 1]), -1.));
                 U[i] = mat_mat_mul(inv_mat(L[i]), C[1]);
-                z[i] = mat_vec_mul(inv_mat(L[i]), vec_vec_sum(b[i], vec_const_mul(mat_vec_mul(B[0], z[i - 1]), -1.)));
+                z[i] = mat_mat_mul(inv_mat(L[i]), mat_mat_sum(b[i], mat_const_mul(mat_mat_mul(B[0], z[i - 1]), -1.)));
             }
 
             L[N - 1] = mat_mat_sum(A[N- 1], mat_const_mul(mat_mat_mul(B[1], U[N - 2]), -1.));
-            y[N - 1] = mat_vec_mul(inv_mat(L[N - 1]), vec_vec_sum(b[N - 1], vec_const_mul(mat_vec_mul(B[1], z[N - 2]), -1.)));
+            y[N - 1] = mat_mat_mul(inv_mat(L[N - 1]), mat_mat_sum(b[N - 1], mat_const_mul(mat_mat_mul(B[1], z[N - 2]), -1.)));
 
 
             for (int i = N - 2; i >= 0; i--){
-                y[i] = vec_vec_sum(z[i], vec_const_mul(mat_vec_mul(U[i], y[i + 1]) , -1.));
+                y[i] = mat_mat_sum(z[i], mat_const_mul(mat_mat_mul(U[i], y[i + 1]) , -1.));
             }
             suma = 0.;
 
