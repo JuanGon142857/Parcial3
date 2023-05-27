@@ -46,6 +46,7 @@ class Parcial{
         std :: vector <double> X;      //Puntos donde se evalua la funcion
 
         std :: vector <std :: vector <double>> omega;   //Aquì se guarda la parte real "v" y compleja "w" de las aproximaciones obtenidas
+        std :: vector <std :: vector <double>> temp;    //Aqui se guardan las aproximaciones de cada paso mientras la solucion converge al valor buscado
         //Estas partes no se puede agrupar en un vector de numeros complejos porqué parte del proceso incluye calcular el jacobiano respecto a estas variables
         //Calcular el jacobiano respecto a un número complejo resulta en un término cuya derivada no existe en los complejos
 
@@ -58,16 +59,10 @@ class Parcial{
         std :: vector <double> vec_vec_sum( std :: vector <double>, std :: vector <double>);
         std :: vector <double> vec_const_mul( std :: vector <double>, double);
 
-        std :: vector <double> F(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
+        std :: vector <double> F(int);
 
-        std :: vector <double> df1_di(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
-        std :: vector <double> df2_di(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
-
-        std :: vector <double> df1_dimenos1(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
-        std :: vector <double> df2_dimenos1(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
-
-        std :: vector <double> df1_dimas1(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
-        std :: vector <double> df2_dimas1(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>, int);
+        std :: vector <double> df1_di(int);
+        std :: vector <double> df2_di(int);
 
         std :: vector <std :: vector <double>> mat_mat_mul(std :: vector <std :: vector <double>>, std :: vector <std :: vector <double>>);  //multiplicacion entre matrices
         std :: vector <double> mat_vec_mul(std :: vector <std :: vector <double>>, std :: vector <double>); //multiplicacion de matriz por vector

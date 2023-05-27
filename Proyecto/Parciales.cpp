@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <fstream>
 #include <complex>
+#include <algorithm>
 
 #include "Parciales.h" 
 
@@ -96,12 +97,7 @@ void Parcial :: Set_X() {
     }
 };
 
-complex <double> Parcial :: f( double x) {
-    double a = 1;
-    double c = 1;
-    return sqrt( 2 * a / gamma ) * 1. / cosh(sqrt(-2 * a / beta) * x) * exp( 1i * (-c / beta) * x);
-};
-
+//Funcion para sacar el inverso de matriz 2x2
 vector <vector <double>> Parcial :: inv_mat(vector <vector <double>> A){
     double det = A[0][0] * A[1][1] - A[1][0] * A[0][1];
     if (A.size() == 2 && A[0].size() == 2){
@@ -122,8 +118,9 @@ vector <vector <double>> Parcial :: inv_mat(vector <vector <double>> A){
     }
     return vector<vector <double>>{0};
     
-}; //Saca inverso de matriz 2x2
+}; 
 
+//Funcion para multiplicar 2 matrices 2x2
 vector <vector <double>> Parcial :: mat_mat_mul(vector <vector <double>> A,vector <vector <double>> B){
     if (A[0].size() == B.size()){
         vector <vector <double>> C(A.size(), vector<double> (B[0].size()));
@@ -144,6 +141,7 @@ vector <vector <double>> Parcial :: mat_mat_mul(vector <vector <double>> A,vecto
     return vector<vector <double>>{0};
 }
 
+//Funcion para aplicar matriz 2x2 sobre vector 2x1
 vector <double> Parcial :: mat_vec_mul(vector <vector <double>> M, vector <double> v){
     if (M[0].size() == v.size()){
         vector <double> vp(M.size());
@@ -164,6 +162,7 @@ vector <double> Parcial :: mat_vec_mul(vector <vector <double>> M, vector <doubl
     return vector<double>{0};
 }
 
+//Funcion para sumar dos matrices
 vector<vector <double>> Parcial :: mat_mat_sum(vector <vector <double>> A, vector <vector <double>> B){
     if ((A.size() == B.size()) && (A[0].size() == B[0].size())){
         vector <vector <double>> C = A;
@@ -180,6 +179,7 @@ vector<vector <double>> Parcial :: mat_mat_sum(vector <vector <double>> A, vecto
     return vector<vector <double>>{0};
 }
 
+//Funcion para multiplicar matriz por una constante
 vector<vector <double>> Parcial :: mat_const_mul(vector <vector <double>> A, double c){
     vector <vector <double>> cA = A;
     for (int i = 0; i < A.size(); i++){
@@ -190,6 +190,7 @@ vector<vector <double>> Parcial :: mat_const_mul(vector <vector <double>> A, dou
     return cA;
 }
 
+//Funcion para sumar 2 vectores
 vector <double> Parcial :: vec_vec_sum(vector <double> A, vector <double> B){
     if ((A.size() == B.size())){
         vector <double> C = A;
@@ -204,6 +205,7 @@ vector <double> Parcial :: vec_vec_sum(vector <double> A, vector <double> B){
     return vector <double>{0};
 }
 
+//Funcion para multiplicar vector por una constante
 vector <double> Parcial :: vec_const_mul(vector <double> A, double c){
     vector <double> cA = A;
     for (int i = 0; i < A.size(); i++){
@@ -212,74 +214,47 @@ vector <double> Parcial :: vec_const_mul(vector <double> A, double c){
     return cA;
 }
 
-vector <double> Parcial :: F(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double modulo = pow((nmas1[i][0] + n[i][0]), 2.) + pow((nmas1[i][1] + n[i][1]), 2.);
+//Función de condiciones iniciales
+complex <double> Parcial :: f( double x) {
+    double a = 10;
+    double c = 1;
+    return sqrt( 2 * a / gamma ) * 1. / cosh(sqrt(-2 * a / beta) * x) * exp( 1i * (-c / beta) * x);
+};
+
+//Funcion que define el sistema de ecuaciones no lineales
+vector <double> Parcial :: F(int i){
+    double modulo = pow((temp[i][0] + omega[i][0]), 2.) + pow((temp[i][1] + omega[i][1]), 2.);
     double REAL;
     double IMAG;
     if (i == 0){
-        REAL = nmas1[i][0] - n[i][0] + beta * k / (2. * h * h) * (2. * nmas1[i][1] + 2. * n[i][1] - 2. * nmas1[i + 1][1] - 2. * n[i + 1][1]) / 2. + k * gamma / 4. * modulo * (nmas1[i][1] + n[i][1]) / 2.;
-        IMAG = nmas1[i][1] - n[i][1] - beta * k / (2. * h * h) * (2. * nmas1[i][0] + 2. * n[i][0] - 2. * nmas1[i + 1][0] - 2. * n[i + 1][0]) / 2. - k * gamma / 4. * modulo * (nmas1[i][0] + n[i][0]) / 2.;
+        REAL = temp[i][0] - omega[i][0] + beta * k / (2. * h * h) * (2. * temp[i][1] + 2. * omega[i][1] - 2. * temp[i + 1][1] - 2. * omega[i + 1][1]) / 2. + k * gamma / 4. * modulo * (temp[i][1] + omega[i][1]) / 2.;
+        IMAG = temp[i][1] - omega[i][1] - beta * k / (2. * h * h) * (2. * temp[i][0] + 2. * omega[i][0] - 2. * temp[i + 1][0] - 2. * omega[i + 1][0]) / 2. - k * gamma / 4. * modulo * (temp[i][0] + omega[i][0]) / 2.;
     }
     if (i > 0 && i < N - 1){
-        REAL = nmas1[i][0] - n[i][0] + beta * k / (2. * h * h) * (- nmas1[i - 1][1] - n[i - 1][1] + 2. * nmas1[i][1] + 2. * n[i][1] - nmas1[i + 1][1] - n[i + 1][1]) / 2. + k * gamma / 4. * modulo * (nmas1[i][1] + n[i][1]) / 2.;
-        IMAG = nmas1[i][1] - n[i][1] - beta * k / (2. * h * h) * (- nmas1[i - 1][0] - n[i - 1][0] + 2. * nmas1[i][0] + 2. * n[i][0] - nmas1[i + 1][0] - n[i + 1][0]) / 2. - k * gamma / 4. * modulo * (nmas1[i][0] + n[i][0]) / 2.;
+        REAL = temp[i][0] - omega[i][0] + beta * k / (2. * h * h) * (- temp[i - 1][1] - omega[i - 1][1] + 2. * temp[i][1] + 2. * omega[i][1] - temp[i + 1][1] - omega[i + 1][1]) / 2. + k * gamma / 4. * modulo * (temp[i][1] + omega[i][1]) / 2.;
+        IMAG = temp[i][1] - omega[i][1] - beta * k / (2. * h * h) * (- temp[i - 1][0] - omega[i - 1][0] + 2. * temp[i][0] + 2. * omega[i][0] - temp[i + 1][0] - omega[i + 1][0]) / 2. - k * gamma / 4. * modulo * (temp[i][0] + omega[i][0]) / 2.;
     }
     if (i == N - 1){
-        REAL = nmas1[i][0] - n[i][0] + beta * k / (2. * h * h) * (- 2. * nmas1[i - 1][1] - 2. * n[i - 1][1] + 2. * nmas1[i][1] + 2. * n[i][1]) / 2. + k * gamma / 4. * modulo * (nmas1[i][1] + n[i][1]) / 2.;
-        IMAG = nmas1[i][1] - n[i][1] - beta * k / (2. * h * h) * (- 2. * nmas1[i - 1][0] - 2. * n[i - 1][0] + 2. * nmas1[i][0] + 2. * n[i][0]) / 2. - k * gamma / 4. * modulo * (nmas1[i][0] + n[i][0]) / 2.;
+        REAL = temp[i][0] - omega[i][0] + beta * k / (2. * h * h) * (- 2. * temp[i - 1][1] - 2. * omega[i - 1][1] + 2. * temp[i][1] + 2. * omega[i][1]) / 2. + k * gamma / 4. * modulo * (temp[i][1] + omega[i][1]) / 2.;
+        IMAG = temp[i][1] - omega[i][1] - beta * k / (2. * h * h) * (- 2. * temp[i - 1][0] - 2. * omega[i - 1][0] + 2. * temp[i][0] + 2. * omega[i][0]) / 2. - k * gamma / 4. * modulo * (temp[i][0] + omega[i][0]) / 2.;
     }
     return vector <double>{REAL, IMAG};
 }
 
-vector <double> Parcial :: df1_di(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double modulo = pow((nmas1[i][0] + n[i][0]), 2.) + pow((nmas1[i][1] + n[i][1]), 2.);
-    double dREAL = 1. + k * gamma / 4. * 2. * (nmas1[i][0] + n[i][0]) * (nmas1[i][1] + n[i][1]) / 2.;
-    double dIMAG = beta * k / (2. * h * h) + k * gamma / 4. * 2. * (nmas1[i][1] + n[i][1]) * (nmas1[i][1] + n[i][1]) / 2. + k * gamma / 4. * modulo / 2.;
+vector <double> Parcial :: df1_di(int i){
+    double modulo = pow((temp[i][0] + omega[i][0]), 2.) + pow((temp[i][1] + omega[i][1]), 2.);
+    double dREAL = 1. + k * gamma / 4. * (temp[i][0] + omega[i][0]) * (temp[i][1] + omega[i][1]);
+    double dIMAG = beta * k / (2. * h * h) + k * gamma / 4. * (temp[i][1] + omega[i][1]) * (temp[i][1] + omega[i][1]) + k * gamma * modulo / 8.;
     return vector <double>{dREAL, dIMAG};
 }
 
-vector <double> Parcial :: df2_di(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double modulo = pow((nmas1[i][0] + n[i][0]), 2.) + pow((nmas1[i][1] + n[i][1]), 2.);
-    double dREAL = - beta * k / (2. * h * h) - k * gamma / 4. * 2. * (nmas1[i][0] + n[i][0]) * (nmas1[i][0] + n[i][0]) / 2. - k * gamma / 4. * modulo / 2.;
-    double dIMAG = 1. - k * gamma / 4. * 2. * (nmas1[i][1] + n[i][1]) * (nmas1[i][0] + n[i][0]) / 2.;
+vector <double> Parcial :: df2_di(int i){
+    double modulo = pow((temp[i][0] + omega[i][0]), 2.) + pow((temp[i][1] + omega[i][1]), 2.);
+    double dREAL = - beta * k / (2. * h * h) - k * gamma / 4. * (temp[i][0] + omega[i][0]) * (temp[i][0] + omega[i][0]) - k * gamma * modulo / 8.;
+    double dIMAG = 1. - k * gamma / 2. * (temp[i][1] + omega[i][1]) * (temp[i][0] + omega[i][0]) / 2.;
     return vector <double>{dREAL, dIMAG};
 }
 
-vector <double> Parcial :: df1_dimenos1(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double dREAL = 0;
-    double dIMAG = - beta * k / (4 * h * h);
-    if (i == N - 1){
-        dIMAG = dIMAG * 2;
-    }
-    return vector <double>{dREAL, dIMAG};
-}
-
-vector <double> Parcial :: df2_dimenos1(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double dREAL = beta * k / (4 * h * h);
-    double dIMAG = 0;
-    if (i == N - 1){
-        dREAL = dREAL * 2;
-    }
-    return vector <double>{dREAL, dIMAG};
-}
-
-vector <double> Parcial :: df1_dimas1(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double dREAL = 0;
-    double dIMAG = - beta * k / (4 * h * h);
-    if (i == 0){
-        dIMAG = dIMAG * 2;
-    }
-    return vector <double>{dREAL, dIMAG};
-}
-
-vector <double> Parcial :: df2_dimas1(vector <vector <double>> nmas1, vector <vector <double>> n, int i){
-    double dREAL = beta * k / (4 * h * h);
-    double dIMAG = 0;
-    if (i == 0){
-        dREAL = dREAL * 2;
-    }
-    return vector <double>{dREAL, dIMAG};
-}
 
 
 void Parcial :: CrankNicolson( const char* filename ){
@@ -287,18 +262,21 @@ void Parcial :: CrankNicolson( const char* filename ){
     omega.clear();
 
     for (int i = 0; i < N; i++){
-        omega.push_back(vector <double>{f(xL + i * h).real(), f(xL + i * h).imag()}); //condiciones iniciales. /Este vector 
+        omega.push_back(vector <double>{f(xL + i * h).real(), f(xL + i * h).imag()}); //condiciones iniciales.
+        temp.push_back(vector <double>{0, 0}); //
     }
 
-    ofstream Solucion( filename);
-    Solucion.close();
+    ofstream Solucion( filename); // El archivo solo se abre una vez
+    if (!Solucion){
+    cerr << "No se pudo crear el archivo \n";
+    exit( 1 );
+    }
     
     vector <vector <double>> b(N);
-    vector <vector <double>> temp(N); //Aqui se guardan las aproximaciones de cada paso mientras la solucion converge al valor buscado
 
     vector <vector <vector <double>>> A(N);
-    vector <vector <vector <double>>> B(N);
-    vector <vector <vector <double>>> C(N); //Bloques de matrices para el jacobiano
+    vector <vector <vector <double>>> B(2);
+    vector <vector <vector <double>>> C(2); //Bloques de matrices para el jacobiano
 
     vector <vector <vector <double>>> L(N);
     vector <vector <vector <double>>> U(N); //Bloques de matrices de la descomposicion LU
@@ -306,6 +284,12 @@ void Parcial :: CrankNicolson( const char* filename ){
     vector <vector <double>> z(N); //Vector que se usa para el algoritmo de Crout
     vector <vector <double>> y(N); //corrección
     double suma;
+
+    C[0] = vector< vector <double>>{{0, - beta * k / (2 * h * h)} , {beta * k / (2 * h * h), 0}};
+    C[1] = vector< vector <double>>{{0, - beta * k / (4 * h * h)} , {beta * k / (4 * h * h), 0}};
+
+    B[0] = vector< vector <double>>{{0, - beta * k / (4 * h * h)} , {beta * k / (4 * h * h), 0}};
+    B[1] = vector< vector <double>>{{0, - beta * k / (2 * h * h)} , {beta * k / (2 * h * h), 0}}; 
 
     bool Correcto = true;
     for (int jj = 0; jj <= m; jj++){
@@ -315,44 +299,46 @@ void Parcial :: CrankNicolson( const char* filename ){
         while (Correcto == false){  //Mientras la corrección de las aproximaciones no tienda a 0
 
             for (int i = 0; i < N; i++){
-                b[i] = F(temp, omega, i); //Define el vector b para el sistema Jx = b que se debe resolver
+                b[i] = F(i); //Define el vector b para el sistema Jx = b que se debe resolver
             }
             for (int i = 0; i < N; i++){
-                A[i] = vector< vector <double>>{df1_di(temp, omega, i) , df2_di(temp, omega, i)};
-            }
+                A[i] = vector< vector <double>>{df1_di(i) , df2_di(i)};
+            }//Define los bloques de matrices 2x2 que forman el jacobiano tridiagonal por bloques
+            
+            /*
             for (int i = 0; i < N - 1; i++){
-                C[i] = vector< vector <double>>{df1_dimas1(temp, omega, i) , df2_dimas1(temp, omega, i)};
+                C[i] = vector< vector <double>>{df1_dimas1(i) , df2_dimas1(i)};
             }
             for (int i = 1; i < N; i++){
-                B[i] = vector< vector <double>>{df1_dimenos1(temp, omega, i) , df2_dimenos1(temp, omega, i)};
-            } //Define los bloques de matrices 2x2 que forman el jacobiano tridiagonal por bloques
+                B[i] = vector< vector <double>>{df1_dimenos1(i) , df2_dimenos1(i)};
+            } 
+            */
 
-            L[0] = A[0];
-            U[0] = mat_mat_mul(inv_mat(L[0]), C[0]);
-            z[0] = mat_vec_mul(inv_mat(L[0]), b[0]);
+           //Algoritmo de Crout por bloques de matrices 2x2
+            U[0] = mat_mat_mul(inv_mat(A[0]), C[0]);
+            z[0] = mat_vec_mul(inv_mat(A[0]), b[0]);
 
-            for (int i = 1; i < L.size() - 1; i++){
-                L[i] = mat_mat_sum(A[i], mat_const_mul(mat_mat_mul(B[i], U[i - 1]), -1.));
-                U[i] = mat_mat_mul(inv_mat(L[i]), C[i]);
-                z[i] = mat_vec_mul(inv_mat(L[i]), vec_vec_sum(b[i], vec_const_mul(mat_vec_mul(B[i], z[i - 1]), -1.)));
+            for (int i = 1; i < N - 1; i++){
+                L[i] = mat_mat_sum(A[i], mat_const_mul(mat_mat_mul(B[0], U[i - 1]), -1.));
+                U[i] = mat_mat_mul(inv_mat(L[i]), C[1]);
+                z[i] = mat_vec_mul(inv_mat(L[i]), vec_vec_sum(b[i], vec_const_mul(mat_vec_mul(B[0], z[i - 1]), -1.)));
             }
 
-            L[L.size() - 1] = mat_mat_sum(A[L.size() - 1], mat_const_mul(mat_mat_mul(B[L.size() - 1], U[L.size() - 2]), -1.));
-            z[L.size() - 1] = mat_vec_mul(inv_mat(L[L.size() - 1]), vec_vec_sum(b[L.size() - 1], vec_const_mul(mat_vec_mul(B[L.size() - 1], z[L.size() - 2]), -1.)));
+            L[N - 1] = mat_mat_sum(A[N- 1], mat_const_mul(mat_mat_mul(B[1], U[N - 2]), -1.));
+            y[N - 1] = mat_vec_mul(inv_mat(L[N - 1]), vec_vec_sum(b[N - 1], vec_const_mul(mat_vec_mul(B[1], z[N - 2]), -1.)));
 
-            y[L.size() - 1] = z[L.size() - 1];
 
-            for (int i = L.size() - 2; i >= 0; i--){
+            for (int i = N - 2; i >= 0; i--){
                 y[i] = vec_vec_sum(z[i], vec_const_mul(mat_vec_mul(U[i], y[i + 1]) , -1.));
             }
             suma = 0.;
 
-            for (int i = L.size() - 1; i >= 0; i--){
-                suma = y[i][0] * y[i][0] + y[i][1] * y[i][1]; //tamaño del error
+            for (int i = N - 1; i >= 0; i--){
+                suma = y[i][0] * y[i][0] + y[i][1] * y[i][1]; //Tamaño de la correccion que se le tuvo que hacer a la solución.
             }
             cout << "Modulo de la correccion: "<< suma << "\n";
 
-            for (int i = L.size() - 1; i >= 0; i--){
+            for (int i = N - 1; i >= 0; i--){
                 temp[i][0] = temp[i][0] - y[i][0];
                 temp[i][1] = temp[i][1] - y[i][1];
             }
@@ -363,27 +349,18 @@ void Parcial :: CrankNicolson( const char* filename ){
         }
         omega = temp;
 
-        //Devolver
-        ofstream Solucion( filename, ios :: app);
-        if (!Solucion){
-            cerr << "No se pudo crear el archivo \n";
-            exit( 1 );
-        }
-        
-        else{
-            //Solucion << jj * k;
-            for (int i = 0; i < Get_N(); i++){
-                if (omega[i][1] >= 0){
-                    Solucion  << setw(9) << setprecision(8) << omega[i][0] << "+" << omega[i][1] << "i" << ","; 
-                }
-                else{
-                    Solucion << setw(9) << setprecision(8) << omega[i][0] << setw(9) << setprecision(8) << omega[i][1] << "i" << ","; 
-                }
-                
+        //Solucion << jj * k;
+        for (int i = 0; i < Get_N(); i++){
+            if (omega[i][1] > 0){
+                Solucion  << setw(9) << setprecision(8) << omega[i][0] << "+" << omega[i][1] << "i" << ","; 
             }
-            Solucion << "\n";
-            Solucion.close();
-        }
-
+            else{
+                Solucion << setw(9) << setprecision(8) << omega[i][0] << setw(9) << setprecision(8) << omega[i][1] << "i" << ","; 
+            }
+                
+         }
+        Solucion << "\n";
     }
+    Solucion.close();
+
 }
