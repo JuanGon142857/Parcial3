@@ -11,7 +11,7 @@
 
 using namespace std;
 
-Parcial :: Parcial(double xL, double xR, double Beta, double Gamma, double T, int N, int m, double TOL){
+Parcial :: Parcial(double xL, double xR, double Beta, double Gamma, double T, int N, int m, double TOL, complex <double> (*g)(double)){
     Set_xL(xL);
     Set_xR(xR);
     Set_beta(Beta);
@@ -20,6 +20,11 @@ Parcial :: Parcial(double xL, double xR, double Beta, double Gamma, double T, in
     Set_N(N);
     Set_m(m);
     Set_TOL(TOL);
+
+    for (int i = 0; i < N; i++){
+        omega.push_back(vector <double>{g(xL + i * h).real(), g(xL + i * h).imag()}); //condiciones iniciales.
+        temp.push_back(vector <double>{0, 0}); //
+    }
 }
 
 void Parcial :: Set_xL(double b){
@@ -214,13 +219,6 @@ vector <double> Parcial :: mat_const_mul(vector <double> A, double c){
     return cA;
 }
 
-//Función de condiciones iniciales
-complex <double> Parcial :: f( double x) {
-    double a = 1;
-    double c = 1;
-    return sqrt( 2 * a / gamma ) * 1. / cosh(sqrt(-2 * a / beta) * x) * exp( 1i * (-c / beta) * x);
-};
-
 //Funcion que define el sistema de ecuaciones no lineales
 vector <double> Parcial :: F(int i){
     double modulo = pow((temp[i][0] + omega[i][0]), 2.) + pow((temp[i][1] + omega[i][1]), 2.);
@@ -258,13 +256,6 @@ vector <double> Parcial :: df2_di(int i){
 
 
 void Parcial :: CrankNicolson( const char* filename ){
-
-    omega.clear();
-
-    for (int i = 0; i < N; i++){
-        omega.push_back(vector <double>{f(xL + i * h).real(), f(xL + i * h).imag()}); //condiciones iniciales.
-        temp.push_back(vector <double>{0, 0}); //
-    }
 
     ofstream Solucion( filename); // El archivo solo se abre una vez
     if (!Solucion){

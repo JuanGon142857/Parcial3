@@ -6,7 +6,7 @@
 
 class Parcial{
     public:
-        Parcial(double = -30, double = 70, double = -1, double = 2./3, double = 1, int = 10, int = 10, double = 1e-4); //constructor predeterminado
+        Parcial(double, double, double, double, double, int, int, double, std :: complex <double> (*)(double)); //constructor predeterminado
 
         void Set_xL( double );
         void Set_xR( double );
@@ -22,12 +22,9 @@ class Parcial{
         int Get_m() const;
         int Get_N() const;
 
-        std :: complex <double> f(double);
-
         void CrankNicolson( const char* );
         void Set_X();
 
-        std :: vector <std :: complex <double>> Get_omega() const;
         std :: vector <double> Get_X() const;
 
     private:
@@ -45,8 +42,8 @@ class Parcial{
 
         std :: vector <double> X;      //Puntos donde se evalua la funcion
 
-        std :: vector <std :: vector <double>> omega;   //Aquì se guarda la parte real "v" y compleja "w" de las aproximaciones obtenidas
-        std :: vector <std :: vector <double>> temp;    //Aqui se guardan las aproximaciones de cada paso mientras la solucion converge al valor buscado
+        std :: vector <std :: vector <double>> omega{};   //Aquì se guarda la parte real "v" y compleja "w" de las aproximaciones obtenidas
+        std :: vector <std :: vector <double>> temp{};    //Aqui se guardan las aproximaciones de cada paso mientras la solucion converge al valor buscado
         //Estas partes no se puede agrupar en un vector de numeros complejos porqué parte del proceso incluye calcular el jacobiano respecto a estas variables
         //Calcular el jacobiano respecto a un número complejo resulta en un término cuya derivada no existe en los complejos
 
